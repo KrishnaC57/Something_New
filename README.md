@@ -75,7 +75,7 @@
 +--------+---------+--------+------+-------------------+------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/KrishnaC57/Something_New/blob/main/Scenerio-1.py> <br>
+Scala-Spark - <https://github.com/KrishnaC57/Something_New/blob/main/src/pack/Scenerio1.scala> <br>
 PySpark - <https://github.com/KrishnaC57/Something_New/blob/master/Scenerio-1.py>
 
 **[⬆ Back to Top](#table-of-contents)**
