@@ -74,8 +74,7 @@
 +---------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/mohankrishna02/interview-scenarios-spark-sql/blob/master/src/pack/Scenerio1.scala> <br>
-PySpark - <https://github.com/mohankrishna02/interview-scenarios-spark-sql/blob/master/Scenerio-1.py>
+PySpark - <https://github.com/KrishnaC57/Something_New/blob/main/SFiles/S-1.py>
 SQL - 
 ```
 SELECT persons
@@ -101,36 +100,52 @@ WHERE fruits IN ('Banana', 'Apple')
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-2 
-#### (Need the dates when the status gets changed like ordered to dispatched)
+#### (Difference between fruits sold per each day)
 #### Input :- 
 ```
-+-------+----------+----------+
-|orderid|statusdate|    status|
-+-------+----------+----------+
-|      1|     1-Jan|   Ordered|
-|      1|     2-Jan|dispatched|
-|      1|     3-Jan|dispatched|
-|      1|     4-Jan|   Shipped|
-|      1|     5-Jan|   Shipped|
-|      1|     6-Jan| Delivered|
-|      2|     1-Jan|   Ordered|
-|      2|     2-Jan|dispatched|
-|      2|     3-Jan|   shipped|
-+-------+----------+----------+
++------------+---------+----------+
+| sale_date  | fruit   | num_sold |
++------------+---------+----------+
+| 18-11-2022 | apple   |       10 |
+| 18-11-2022 | oranges |        8 |
+| 19-11-2022 | apple   |        5 |
+| 19-11-2022 | oranges |        5 |
+| 20-11-2022 | apple   |        7 |
+| 20-11-2022 | oranges |       10 |
++------------+---------+----------+
 ```
 #### Expected Output :- 
 ```
-+-------+----------+----------+
-|orderid|statusdate|    status|
-+-------+----------+----------+
-|      1|     2-Jan|dispatched|
-|      1|     3-Jan|dispatched|
-|      2|     2-Jan|dispatched|
-+-------+----------+----------+
++------------+------------+
+| sale_date  | fruit_diff |
++------------+------------+
+| 18-11-2022 |          2 |
+| 19-11-2022 |          0 |
+| 20-11-2022 |         -3 |
++------------+------------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/mohankrishna02/interview-scenarios-spark-sql/blob/master/src/pack/Scenerio2.scala> <br>
-PySpark - <https://github.com/mohankrishna02/interview-scenarios-spark-sql/blob/master/Scenerio2.py>
+PySpark - <https://github.com/KrishnaC57/Something_New/blob/main/SFiles/S-2.py>
+SQL - 
+```
+create table saletab(sale_date varchar(10), fruit varchar(8), num_sold int);
+insert into saletab values('18-11-2022','apple',10),
+('18-11-2022','oranges',8),
+('19-11-2022','apple',5),
+('19-11-2022','oranges',5),
+('20-11-2022','apple',7),
+('20-11-2022','oranges',10);
+
+select * from saletab;
+
+with diff_cte as(
+select sale_date, (num_sold - (lead(num_sold) over(partition by sale_date order by sale_date) )) as fruit_diff
+from saletab
+)
+
+select * from diff_cte
+where fruit_diff is not null;
+```
 
 **[⬆ Back to Top](#table-of-contents)**
 
