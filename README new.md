@@ -589,13 +589,12 @@ From Baskets;
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-11 
-#### (Find CustomerType based on TotalOrders
+* Find CustomerType based on TotalOrders
 * CustomerType Rules:
-* 1 order → New Customer
-* 2 to 5 orders → Regular Customer
-* >5 orders → VIP Customer
- 
-output columns: CustomerID, CustName, TotalOrders, CustomerType )
+	* 1 order → New Customer
+	* 2 to 5 orders → Regular Customer
+	* More than 5 orders → VIP Customer
+* output columns: CustomerID, CustName, TotalOrders, CustomerType
 #### Input :- 
 ```
 +------------+----------+
