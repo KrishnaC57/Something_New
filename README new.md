@@ -322,7 +322,7 @@ UNION ALL
 +---------+
 ```
 #### Solution :- 
-PySpark - <SFiles/S-6.py> <br>
+PySpark - [S-6.py](<SFiles/S-6.py>) <br>
 SQL -
 ```
 CREATE TABLE mobile_data (
