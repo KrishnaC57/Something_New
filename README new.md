@@ -74,7 +74,7 @@
 +---------+
 ```
 #### Solution :- 
-PySpark - <https://github.com/KrishnaC57/Something_New/blob/main/SFiles/S-1.py> <br>
+PySpark - [Click Here](<SFiles/S-1.py>) <br>
 SQL - 
 ```
 SELECT persons
@@ -125,7 +125,7 @@ WHERE fruits IN ('Banana', 'Apple')
 +------------+------------+
 ```
 #### Solution :- 
-PySpark - <https://github.com/KrishnaC57/Something_New/blob/main/SFiles/S-2.py> <br>
+PySpark - [Click Here](<SFiles/S-2.py>) <br>
 SQL - 
 ```
 create table saletab(sale_date varchar(10), fruit varchar(8), num_sold int);
@@ -267,7 +267,7 @@ Order by Department, age desc;
 +---------+------------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-5.pyy>) <br>
+PySpark - [Click Here](<SFiles/S-5.py>) <br>
 SQL - 
 ```
 CREATE TABLE country_population (country varchar(8),population varchar(10));
