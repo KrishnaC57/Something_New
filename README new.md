@@ -597,6 +597,7 @@ From Baskets;
 * output columns: CustomerID, CustName, TotalOrders, CustomerType
 #### Input :- 
 ```
+Customers table:
 +------------+----------+
 | CustomerID | CustName |
 +------------+----------+
@@ -608,6 +609,7 @@ From Baskets;
 +------------+----------+
 ```
 ```
+Orders Table:
 +---------+------------+
 | OrderID | CustomerID |
 +---------+------------+
@@ -635,6 +637,7 @@ From Baskets;
 PySpark - [S-11.py](<SFiles/S-11.py>) <br>
 SQL -
 ```
+-- Create Customers table
 CREATE TABLE Customers
 (
   CustomerID INT PRIMARY KEY,
