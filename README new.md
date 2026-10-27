@@ -299,69 +299,65 @@ UNION ALL
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-6 
-#### (For Employee salary greater than 10000 give designation as manager else employee)
+#### (Find the user_id which are having more outgoing messages for Feb month compared to Jan month)
 #### Input :-
 ```
-+-----+----+------+
-|empid|name|salary|
-+-----+----+------+
-|    1|   a| 10000|
-|    2|   b|  5000|
-|    3|   c| 15000|
-|    4|   d| 25000|
-|    5|   e| 50000|
-|    6|   f|  7000|
-+-----+----+------+
++---------+---------------+----------+------------+
+| user_id | mobile_number | msg_type | mob_date   |
++---------+---------------+----------+------------+
+|   12345 | 9988445566    | outgoing | 2022-01-23 |
+|   67890 | 8899445566    | incoming | 2022-02-01 |
+|   78915 | 7799884455    | outgoing | 2022-01-23 |
+|   12345 | 6698112244    | outgoing | 2022-02-02 |
+|   12345 | 5598445566    | incoming | 2022-01-24 |
+|   12345 | 1199885544    | outgoing | 2022-02-05 |
++---------+---------------+----------+------------+
 ```
 #### Expected Output :- 
 ```
-+-----+----+------+-----------+
-|empid|name|salary|Designation|
-+-----+----+------+-----------+
-|    1|   a| 10000|   Employee|
-|    2|   b|  5000|   Employee|
-|    3|   c| 15000|    Manager|
-|    4|   d| 25000|    Manager|
-|    5|   e| 50000|    Manager|
-|    6|   f|  7000|   Employee|
-+-----+----+------+-----------+
++---------+
+| user_id |
++---------+
+|   12345 |
++---------+
 ```
 #### Solution :- 
-Scala-Spark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio6.scala>) <br>
-PySpark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio6.py>) <br>
+PySpark - <SFiles/S-6.py> <br>
 SQL -
 ```
-SELECT *,
-    CASE
-    WHEN salary > 10000 THEN
-    'Manager'
-    ELSE 'Employee'
-    END AS Designation
-FROM emptab
-```
-Pandas - 
-```
-import pandas as pd
+CREATE TABLE mobile_data (
+    user_id INT,
+    mobile_number TEXT,
+    msg_type TEXT,
+    mob_date DATE
+);
 
-data = [
-    ("1", "a", 10000),
-    ("2", "b", 5000),
-    ("3", "c", 15000),
-    ("4", "d", 25000),
-    ("5", "e", 50000),
-    ("6", "f", 7000),
-]
+INSERT INTO mobile_data VALUES
+(12345, '9988445566', 'outgoing', '2022-01-23'),
+(67890, '8899445566', 'incoming', '2022-02-01'),
+(78915, '7799884455', 'outgoing', '2022-01-23'),
+(12345, '6698112244', 'outgoing', '2022-02-02'),
+(12345, '5598445566', 'incoming', '2022-01-24'),
+(12345, '1199885544', 'outgoing', '2022-02-05');
 
-df = pd.DataFrame(data, columns=["empid", "name", "salary"])
-print(df)
+select * from mobile_data;
 
 
-def emp_desgnination(salary):
-    return "Manager" if salary > 10000 else "Employee"
-
-
-df["Desgniation"] = df["salary"].apply(emp_desgnination)
-print(df)
+SELECT feb.user_id
+FROM (
+    SELECT user_id, COUNT(*) AS feb_count
+    FROM mobile_data
+    WHERE msg_type = 'outgoing' AND MONTH(mob_date) = 2
+    GROUP BY user_id
+) AS feb
+JOIN (
+    SELECT user_id, COUNT(*) AS jan_count
+    FROM mobile_data
+    WHERE msg_type = 'outgoing' AND MONTH(mob_date) = 1
+    GROUP BY user_id
+) AS jan
+ON feb.user_id = jan.user_id
+WHERE feb.feb_count > jan.jan_count;
 ```
 
 **[⬆ Back to Top](#table-of-contents)**
