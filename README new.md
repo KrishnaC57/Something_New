@@ -74,7 +74,7 @@
 +---------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-1.py>) <br>
+PySpark - [S-1.py](<SFiles/S-1.py>) <br>
 SQL - 
 ```
 SELECT persons
@@ -125,7 +125,7 @@ WHERE fruits IN ('Banana', 'Apple')
 +------------+------------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-2.py>) <br>
+PySpark - [S-2.py](<SFiles/S-2.py>) <br>
 SQL - 
 ```
 create table saletab(sale_date varchar(10), fruit varchar(8), num_sold int);
@@ -176,7 +176,7 @@ where fruit_diff is not null;
 +------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-3.py>) <br>
+PySpark - [S-3.py](<SFiles/S-3.py>) <br>
 SQL - 
 ```
 create table tab(id varchar(4));
@@ -219,7 +219,7 @@ select * from tab where id regexp('[?*]');
 +------------+---------+------+--------+------------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-4.py>) <br>
+PySpark - [S-4.py](<SFiles/S-4.py>) <br>
 SQL - 
 ```
 CREATE TABLE raw_data (Name varchar(8),Age Int, Department varchar(10), salary int);
@@ -267,7 +267,7 @@ Order by Department, age desc;
 +---------+------------+
 ```
 #### Solution :- 
-PySpark - [Click Here](<SFiles/S-5.py>) <br>
+PySpark - [S-5.py](<SFiles/S-5.py>) <br>
 SQL - 
 ```
 CREATE TABLE country_population (country varchar(8),population varchar(10));
@@ -363,163 +363,229 @@ WHERE feb.feb_count > jan.jan_count;
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-7
+### (Find Total Tickets, Closed Tickets, Avg Resolution Hours)
 #### Input :- 
 ```
-+-------+----------+----+--------+-----+
-|sale_id|product_id|year|quantity|price|
-+-------+----------+----+--------+-----+
-|      1|       100|2010|      25| 5000|
-|      2|       100|2011|      16| 5000|
-|      3|       100|2012|       8| 5000|
-|      4|       200|2010|      10| 9000|
-|      5|       200|2011|      15| 9000|
-|      6|       200|2012|      20| 7000|
-|      7|       300|2010|      20| 7000|
-|      8|       300|2011|      18| 7000|
-|      9|       300|2012|      20| 7000|
-+-------+----------+----+--------+-----+
++----------+----------------+-------------+-----------------+
+| TicketID | AssignedTo     | Status      | ResolutionHours |
++----------+----------------+-------------+-----------------+
+| TKT-1001 | Alex Johnson   | Resolved    |            2.50 |
+| TKT-1002 | Priya Sharma   | In Progress |            4.00 |
+| TKT-1003 | Alex Johnson   | Closed      |            1.50 |
+| TKT-1004 | Michael Chen   | Open        |            0.00 |
+| TKT-1005 | Priya Sharma   | Resolved    |            6.00 |
+| TKT-1006 | Michael Chen   | Pending     |            3.50 |
+| TKT-1007 | Alex Johnson   | Closed      |            2.00 |
+| TKT-1008 | Sarah Williams | In Progress |            5.00 |
+| TKT-1009 | Priya Sharma   | Resolved    |            7.50 |
+| TKT-1010 | Sarah Williams | Open        |            0.00 |
+| TKT-1011 | Michael Chen   | Resolved    |            4.50 |
+| TKT-1012 | Alex Johnson   | In Progress |            3.00 |
++----------+----------------+-------------+-----------------+
 ```
 #### Expected Output :- 
 ```
-+-------+----------+----+--------+-----+
-|sale_id|product_id|year|quantity|price|
-+-------+----------+----+--------+-----+
-|      6|       200|2012|      20| 7000|
-|      9|       300|2012|      20| 7000|
-|      1|       100|2010|      25| 5000|
-|      8|       300|2011|      18| 7000|
-+-------+----------+----+--------+-----+
++--------------+--------------+---------------+--------------------+
+| AssignedTo   | TotalTickets | ClosedTickets | AvgResolutionHours |
++--------------+--------------+---------------+--------------------+
+| Alex Johnson |            4 |             2 |           1.750000 |
+| Priya Sharma |            3 |             0 |           0.000000 |
+| Michael Chen |            3 |             0 |           0.000000 |
++--------------+--------------+---------------+--------------------+
 ```
 #### Solution :- 
-Scala-Spark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio7.scala>) <br>
-PySpark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio7.py>) <br>
+PySpark - [S-7.py](<SFiles/S-7.py>) <br>
 SQL - 
 ```
-SELECT 
-  * 
-FROM 
-  (
-    SELECT 
-      *, 
-      DENSE_RANK() OVER (
-        PARTITION BY year 
-        ORDER BY 
-          quantity DESC
-      ) AS rank 
-    FROM 
-      salestab
-  ) AS rankdf 
-WHERE 
-  rank = 1 
-ORDER BY 
-  sale_id
-```
-Pandas - 
-```
-import pandas as pd
+CREATE TABLE Tickets
+(
+    TicketID VARCHAR(20) PRIMARY KEY,
+    AssignedTo VARCHAR(100),
+    Status VARCHAR(20),
+    ResolutionHours DECIMAL(5,2)
+);
+ 
+INSERT INTO Tickets (TicketID, AssignedTo, Status, ResolutionHours)
+VALUES
+    ('TKT-1001', 'Alex Johnson', 'Resolved', 2.5),
+    ('TKT-1002', 'Priya Sharma', 'In Progress', 4.0),
+    ('TKT-1003', 'Alex Johnson', 'Closed', 1.5),
+    ('TKT-1004', 'Michael Chen', 'Open', 0.0),
+    ('TKT-1005', 'Priya Sharma', 'Resolved', 6.0),
+    ('TKT-1006', 'Michael Chen', 'Pending', 3.5),
+    ('TKT-1007', 'Alex Johnson', 'Closed', 2.0),
+    ('TKT-1008', 'Sarah Williams', 'In Progress', 5.0),
+    ('TKT-1009', 'Priya Sharma', 'Resolved', 7.5),
+    ('TKT-1010', 'Sarah Williams', 'Open', 0.0),
+    ('TKT-1011', 'Michael Chen', 'Resolved', 4.5),
+    ('TKT-1012', 'Alex Johnson', 'In Progress', 3.0);
+ 
+select * from Tickets;
 
-data = [
-    (1, 100, 2010, 25, 5000),
-    (2, 100, 2011, 16, 5000),
-    (3, 100, 2012, 8, 5000),
-    (4, 200, 2010, 10, 9000),
-    (5, 200, 2011, 15, 9000),
-    (6, 200, 2012, 20, 7000),
-    (7, 300, 2010, 20, 7000),
-    (8, 300, 2011, 18, 7000),
-    (9, 300, 2012, 20, 7000),
-]
-
-df = pd.DataFrame(data, columns=["sale_id", "product_id", "year", "quantity", "price"])
-print(df)
-
-df["rank"] = df.groupby("year")["quantity"].rank(method="dense", ascending=False)
-print(df)
-
-df = df[df["rank"] == 1]
-print(df)
-
-df = df.drop("rank", axis=1).sort_values("sale_id")
-print(df)
+Select AssignedTo, TotalTickets, ClosedTickets, COALESCE(AvgResolutionHours, 0) as AvgResolutionHours
+From (select AssignedTo, count(*) as TotalTickets, 
+      sum(case when Status = "Closed" then 1 else 0 end) as ClosedTickets, 
+      avg(case when Status = "Closed" then ResolutionHours end) as AvgResolutionHours
+    From Tickets
+group by AssignedTo
+having TotalTickets >2 ) as proctab;
 ```
 
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-8
+### (Write a SQL query to group the rows by id and concatenate all data values belonging to the same id into a single comma-separated string)
 #### Input :- 
 ```
-+--------+
-|   teams|
-+--------+
-|   India|
-|Pakistan|
-|SriLanka|
-+--------+
++------+------+
+| id   | data |
++------+------+
+|    1 |    1 |
+|    1 |    2 |
+|    1 |    3 |
+|    2 |    4 |
+|    2 |    5 |
+|    3 |    6 |
+|    3 |    4 |
++------+------+
 ```
 #### Expected Output :- 
 ```
-+--------------------+
-|             matches|
-+--------------------+
-|   India Vs Pakistan|
-|   India Vs SriLanka|
-|Pakistan Vs SriLanka|
-+--------------------+
++------+-------+
+| id   | data  |
++------+-------+
+|    1 | 1,2,3 |
+|    2 | 4,5   |
+|    3 | 6,4   |
++------+-------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio8.scala> <br>
-PySpark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio8.py>
+PySpark - [S-8.py](<SFiles/S-8.py>) <br>
+SQL - 
+```
+Create table cat (id int, data integer);
+Insert into cat values(1,1),(1,2),(1,3),(2,4),(2,5),(3,6),(3,4);
+Select * from cat;
+
+Select id, group_concat(data separator ',') as data from cat group by id;
+```
 
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-9 
-#### (write spark code, list of name of participants who has rank=1 most number of times)
+#### (Find Followers Percentage)
 #### Input :- 
 ```
-+----+---------------+
-|name|           rank|
-+----+---------------+
-|   a|   [1, 1, 1, 3]|
-|   b|   [1, 2, 3, 4]|
-|   c|[1, 1, 1, 1, 4]|
-|   d|            [3]|
-+----+---------------+
++---------+-------------+
+| user_id | follower_id |
++---------+-------------+
+|       1 |           2 |
+|       1 |           3 |
+|       2 |           4 |
+|       5 |           1 |
+|       5 |           3 |
+|      11 |           7 |
+|      12 |           8 |
+|      13 |           5 |
+|      13 |          10 |
+|      14 |          12 |
+|      14 |           3 |
+|      15 |          14 |
+|      15 |          13 |
++---------+-------------+
 ```
 #### Expected Output :- 
 ```
-c
++---------+-------------------+
+| user_id | famous_percentage |
++---------+-------------------+
+|       1 |           15.3846 |
+|       2 |            7.6923 |
+|       5 |           15.3846 |
+|      11 |            7.6923 |
+|      12 |            7.6923 |
+|      13 |           15.3846 |
+|      14 |           15.3846 |
+|      15 |           15.3846 |
++---------+-------------------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio9.scala> <br>
-PySpark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio9.py>
+PySpark - [S-9.py](<SFiles/S-9.py>) <br>
+SQL - 
+```
+create table famous (user_id INT, follower_id INT);
+Insert Into famous values(1, 2), (1, 3), (2, 4), (5, 1), (5, 3), (11, 7), 
+(12, 8), (13, 5), (13, 10), (14, 12), (14, 3), (15, 14), (15, 13);
+
+Select * from famous;
+
+with distinct_users as(
+select user_id as users from famous
+UNION
+select follower_id as users from famous
+),
+
+follower_count as (
+select user_id, count(follower_id ) as followers 
+from famous 
+group by user_id
+)
+
+select f.user_id, 
+(f.followers * 100)/(select count(*) from distinct_users) as famous_percentage 
+from follower_count as f;
+```
 
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-10
+```
+* Given a table containing a Person and a comma-separated list of fruits in their Basket, write a SQL query or PySpark program to transform the data so that:
+* Each unique fruit becomes a separate column.
+* If the person's basket contains that fruit, display Yes.
+* Otherwise, display No.
+* Keep one row per person.
+```
 #### Input :- 
 ```
-+-----+-------------+-------------+
-|empid|commissionamt|monthlastdate|
-+-----+-------------+-------------+
-|    1|          300|  31-Jan-2021|
-|    1|          400|  28-Feb-2021|
-|    1|          200|  31-Mar-2021|
-|    2|         1000|  31-Oct-2021|
-|    2|          900|  31-Dec-2021|
-+-----+-------------+-------------+
++--------+---------------------+
+| Person | Basket              |
++--------+---------------------+
+| A      | Apple, Mango,Orange |
+| B      | Apple               |
+| C      | Guava,Cherry        |
+| D      | Mango,Cherry,Orange |
++--------+---------------------+
 ```
 #### Expected Output :- 
 ```
-+-----+-------------+-------------+
-|empid|commissionamt|monthlastdate|
-+-----+-------------+-------------+
-|    1|          200|  31-Mar-2021|
-|    2|         1000|  31-Oct-2021|
-+-----+-------------+-------------+
++--------+-------+-------+--------+-------+--------+
+| Person | Apple | Mango | Orange | Guava | Cherry |
++--------+-------+-------+--------+-------+--------+
+| A      | Yes   | Yes   | Yes    | No    | No     |
+| B      | Yes   | No    | No     | No    | No     |
+| C      | No    | No    | No     | Yes   | Yes    |
+| D      | No    | Yes   | Yes    | No    | Yes    |
++--------+-------+-------+--------+-------+--------+
 ```
 #### Solution :- 
-Scala-Spark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio10.scala> <br>
-PySpark - <https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio10.py>
+PySpark - [S-10.py](<SFiles/S-10.py>) <br>
+SQL -
+```
+CREATE TABLE Baskets (Person TEXT, Basket TEXT);
+
+INSERT INTO Baskets VALUES ('A', 'Apple, Mango,Orange'),('B', 'Apple'),
+('C', 'Guava,Cherry'),('D', 'Mango,Cherry,Orange');
+
+SELECT * FROM Baskets;
+
+Select Person, case when Basket like '%Apple%' then 'Yes' else 'No' end as Apple,
+  case when Basket like '%Mango%' then 'Yes' else 'No' end as Mango,
+  case when Basket like '%Orange%' then 'Yes' else 'No' end as Orange,
+  case when Basket like '%Guava%' then 'Yes' else 'No' end as Guava,
+  case when Basket like '%Cherry%' then 'Yes' else 'No' end as Cherry
+From Baskets;
+```
 
 **[⬆ Back to Top](#table-of-contents)**
 
