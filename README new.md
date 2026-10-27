@@ -150,226 +150,150 @@ where fruit_diff is not null;
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-3 
+#### (Remove special values from table)
 #### Input :- 
 ```
-+--------+----------+------+
-|sensorid| timestamp|values|
-+--------+----------+------+
-|    1111|2021-01-15|    10|
-|    1111|2021-01-16|    15|
-|    1111|2021-01-17|    30|
-|    1112|2021-01-15|    10|
-|    1112|2021-01-15|    20|
-|    1112|2021-01-15|    30|
-+--------+----------+------+
++------+
+| id   |
++------+
+| 111  |
+| 222  |
+| *    |
+| 333  |
+| 444  |
+| ?5?  |
++------+
 ```
 #### Expected Output :- 
 ```
-+--------+----------+------+
-|sensorid| timestamp|values|
-+--------+----------+------+
-|    1111|2021-01-15|     5|
-|    1111|2021-01-16|    15|
-|    1112|2021-01-15|    10|
-|    1112|2021-01-15|    10|
-+--------+----------+------+
++------+
+| id   |
++------+
+| 111  |
+| 222  |
+| 333  |
+| 444  |
++------+
 ```
 #### Solution :- 
-Scala-Spark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio3.scala>) <br>
-PySpark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio3.py>) <br>
+PySpark - [Click Here](<SFiles/S-3.py>) <br>
 SQL - 
 ```
-SELECT sensorid,
-       timestamp,
-       ( newvalues - values ) AS values
-FROM  (SELECT *,
-              Lead(values, 1, 0)
-                OVER(
-                  partition BY sensorid
-                  ORDER BY values) AS newvalues
-       FROM   timetab)
-WHERE  newvalues != 0
-```
-Pandas - 
-```
-import pandas as pd
+create table tab(id varchar(4));
+insert into tab values('111'),('222'),('*'),('333'),('444'),('???');
 
-data = [
-    (1111, "2021-01-15", 10),
-    (1111, "2021-01-16", 15),
-    (1111, "2021-01-17", 30),
-    (1112, "2021-01-15", 10),
-    (1112, "2021-01-15", 20),
-    (1112, "2021-01-15", 30),
-]
+select * from tab;
+select * from tab where id regexp('^[0-9]+$');
 
-df = pd.DataFrame(data, columns=["sensorid", "timestamp", "values"])
-print(df)
-
-df["newvalues"] = df.groupby("sensorid")["values"].shift(-1)
-print(df)
-
-df = df.dropna(subset=["newvalues"])
-print(df)
-
-df["values"] = df["newvalues"] - df["values"]
-print(df)
-
-df = df.drop(columns=["newvalues"])
-print(df)
+--Other examples
+select * from tab where id regexp('[0-9]');
+select * from tab where id regexp('[?*]');
 ```
 
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-4 
-#### (Write a query to list the unique customer names in the custtab table, along with the number of addresses associated with each customer.)
+#### (Find Avg salary of employees for each department and order the employees with a department by age)
 #### Input :- 
 ```
-+------+-----------+-------+
-|custid|   custname|address|
-+------+-----------+-------+
-|     1|   Mark Ray|     AB|
-|     2|Peter Smith|     CD|
-|     1|   Mark Ray|     EF|
-|     2|Peter Smith|     GH|
-|     2|Peter Smith|     CD|
-|     3|       Kate|     IJ|
-+------+-----------+-------+
++---------+------+------------+--------+
+| Name    | Age  | Department | salary |
++---------+------+------------+--------+
+| ram     |   20 | Finance    |  50000 |
+| Sudeep  |   25 | Sales      |  30000 |
+| Suresh  |   22 | Finance    |  50000 |
+| Pradeep |   28 | Finance    |  20000 |
+| Iqbal   |   22 | Sales      |  20000 |
++---------+------+------------+--------+
 ```
 #### Expected Output :- 
 ```
-+------+-----------+--------+
-|custid|   custname| address|
-+------+-----------+--------+
-|     1|   Mark Ray|[EF, AB]|
-|     2|Peter Smith|[CD, GH]|
-|     3|       Kate|    [IJ]|
-+------+-----------+--------+
++------------+---------+------+--------+------------+
+| Department | Name    | age  | Salary | avg_sal    |
++------------+---------+------+--------+------------+
+| Finance    | Pradeep |   28 |  20000 | 40000.0000 |
+| Finance    | Suresh  |   22 |  50000 | 40000.0000 |
+| Finance    | ram     |   20 |  50000 | 40000.0000 |
+| Sales      | Sudeep  |   25 |  30000 | 25000.0000 |
+| Sales      | Iqbal   |   22 |  20000 | 25000.0000 |
++------------+---------+------+--------+------------+
 ```
 #### Solution :- 
-Scala-Spark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio4.scala>) <br>
-PySpark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio4.py>) <br>
+PySpark - [Click Here](<SFiles/S-4.py>) <br>
 SQL - 
 ```
-SELECT custid,
-       custname,
-       Collect_set(address) AS address
-FROM   custtab
-GROUP  BY custid,
-          custname
-ORDER  BY custid 
-```
-Pandas - 
-```
-data = [
-    (1, "Mark Ray", "AB"),
-    (2, "Peter Smith", "CD"),
-    (1, "Mark Ray", "EF"),
-    (2, "Peter Smith", "GH"),
-    (2, "Peter Smith", "CD"),
-    (3, "Kate", "IJ"),
-]
+CREATE TABLE raw_data (Name varchar(8),Age Int, Department varchar(10), salary int);
 
-df = pd.DataFrame(data, columns=["custid", "custname", "address"])
-print(df)
+INSERT INTO raw_data VALUES ('ram', 20, 'Finance',50000),
+                            ('Sudeep', 25, 'Sales',30000),
+                            ('Suresh', 22, 'Finance',50000),
+                            ('Pradeep', 28, 'Finance',20000),
+                            ('Iqbal', 22, 'Sales',20000);
 
-finaldf = (
-    df.groupby(["custid", "custname"])["address"]
-    .apply(lambda x: list(set(x)))
-    .reset_index()
-)
-print(finaldf)
+SELECT * FROM raw_data;
+
+Select Department, Name, age,Salary, avg(salary) over(partition by Department) avg_sal
+from raw_data
+Order by Department, age desc;
 ```
 
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-5 
-* Read data from above file into dataframes(df1 and df2).
-* Display number of partitions in df1.
-* Create a new dataframe df3 from df1, along with a new column salary, and keep it constant 1000
-* append df2 and df3, and form df4
-* Remove records which have invalid email from df4, emails with @ are considered to be valid.
-* Write df4 to a target location, by partitioning on salary.
+* You have a table with 2 columns
+* 1st Row should have India in country column
+* 2nd row should have highest population irrespective of country
+* 3rd row should have lowest population
 #### Input :- 
 ```
-+---+----+---+-------------+
-| id|name|age|        email|
-+---+----+---+-------------+
-|  1| abc| 31|abc@gmail.com|
-|  2| def| 23| defyahoo.com|
-|  3| xyz| 26|xyz@gmail.com|
-|  4| qwe| 34| qwegmail.com|
-|  5| iop| 24|iop@gmail.com|
-+---+----+---+-------------+
-```
-```
-+---+----+---+---------------+------+
-| id|name|age|          email|salary|
-+---+----+---+---------------+------+
-| 11| jkl| 22|  abc@gmail.com|  1000|
-| 12| vbn| 33|  vbn@yahoo.com|  3000|
-| 13| wer| 27|            wer|  2000|
-| 14| zxc| 30|        zxc.com|  2000|
-| 15| lkj| 29|lkj@outlook.com|  2000|
-+---+----+---+---------------+------+
++---------+------------+
+| country | population |
++---------+------------+
+| Brazil  | 10000      |
+| India   | 15000      |
+| US      | 20000      |
+| UK      | 12000      |
+| Europe  | 12000      |
++---------+------------+
 ```
 #### Expected Output :- 
 ```
-+---+----+---+---------------+------+
-| id|name|age|          email|salary|
-+---+----+---+---------------+------+
-|  1| abc| 31|  abc@gmail.com|  1000|
-|  3| xyz| 26|  xyz@gmail.com|  1000|
-|  5| iop| 24|  iop@gmail.com|  1000|
-| 11| jkl| 22|  abc@gmail.com|  1000|
-| 12| vbn| 33|  vbn@yahoo.com|  3000|
-| 15| lkj| 29|lkj@outlook.com|  2000|
-+---+----+---+---------------+------+
++---------+------------+
+| country | population |
++---------+------------+
+| India   | 15000      |
+| US      | 20000      |
+| Brazil  | 10000      |
++---------+------------+
 ```
 #### Solution :- 
-Scala-Spark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/src/pack/Scenerio5.scala>) <br>
-PySpark - [Click Here](<https://github.com/mohankrishna02/interview-scenerios-spark-sql/blob/master/Scenerio5.py>) <br>
-Pandas - 
+PySpark - [Click Here](<SFiles/S-5.pyy>) <br>
+SQL - 
 ```
-import pandas as pd
+CREATE TABLE country_population (country varchar(8),population varchar(10));
 
-# Read data convert into dataframes(df1 and df2).
-data1 = [
-    (1, "abc", 31, "abc@gmail.com"),
-    (2, "def", 23, "defyahoo.com"),
-    (3, "xyz", 26, "xyz@gmail.com"),
-    (4, "qwe", 34, "qwegmail.com"),
-    (5, "iop", 24, "iop@gmail.com"),
-]
+INSERT INTO country_population VALUES ('Brazil', 10000),('India', 15000),
+('US', 20000),('UK', 12000),('Europe', 12000);
 
-df1 = pd.DataFrame(data1, columns=["id", "name", "age", "email"])
-print(df1)
+SELECT * FROM country_population;
 
-data2 = [
-    (11, "jkl", 22, "abc@gmail.com", 1000),
-    (12, "vbn", 33, "vbn@yahoo.com", 3000),
-    (13, "wer", 27, "wer", 2000),
-    (14, "zxc", 30, "zxc.com", 2000),
-    (15, "lkj", 29, "lkj@outlook.com", 2000),
-]
-
-df2 = pd.DataFrame(data2, columns=["id", "name", "age", "email", "salary"])
-print(df2)
-
-# Create a new dataframe df3 from df1, along with a new column salary, and keep it constant 1000
-df3 = df1.copy()
-df3["salary"] = 1000
-print(df3)
-
-# append df2 and df3, and form df4
-df4 = pd.concat([df2, df3])
-
-df4 = df4.sort_values("id")
-print(df4)
-
-# Remove records which have invalid email from df4, emails with @ are considered to be valid.
-finaldf = df4[df4["email"].str.contains("@", na=False)]
-print(finaldf)
+(
+    SELECT * FROM country_population WHERE country = 'India'
+)
+UNION ALL
+(
+    SELECT * FROM country_population 
+    WHERE country != 'India'
+    ORDER BY population DESC
+    LIMIT 1
+)
+UNION ALL
+(
+    SELECT * FROM country_population 
+    WHERE country != 'India'
+    ORDER BY population ASC
+    LIMIT 1
+);
 ```
 
 **[⬆ Back to Top](#table-of-contents)**
