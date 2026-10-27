@@ -539,12 +539,12 @@ from follower_count as f;
 **[⬆ Back to Top](#table-of-contents)**
 
 ### Scenerio-10
-(Given a table containing a Person and a comma-separated list of fruits in their Basket
-Write a SQL query or PySpark program to transform the data so that:
-    Each unique fruit becomes a separate column.
-    If the person's basket contains that fruit, display Yes.
-    Otherwise, display No.
-    Keep one row per person.)
+* Given a table containing a Person and a comma-separated list of fruits in their Basket
+* Write a SQL query or PySpark program to transform the data so that:
+    * Each unique fruit becomes a separate column.
+    * If the person's basket contains that fruit, display Yes.
+    * Otherwise, display No.
+    * Keep one row per person.
 #### Input :- 
 ```
 +--------+---------------------+
@@ -590,10 +590,10 @@ From Baskets;
 
 ### Scenerio-11 
 #### (Find CustomerType based on TotalOrders
-CustomerType Rules:
-1 order → New Customer
-2 to 5 orders → Regular Customer
-More than 5 orders → VIP Customer
+* CustomerType Rules:
+* 1 order → New Customer
+* 2 to 5 orders → Regular Customer
+* >5 orders → VIP Customer
  
 output columns: CustomerID, CustName, TotalOrders, CustomerType )
 #### Input :- 
