@@ -9,6 +9,6 @@ df = spark.createDataFrame(data, columns)
 df.show()
 
 result = df.alias("e").join(df.alias("m"), col("e.mgrid") == col("m.empid"), "left")\
-            .select(col("e.empname"),col("m.empname").alias("mgrname"))\
-            .withColumn("mgr_name", coalesce(col('mgrname'), lit("No_mgr")))
+            .select(col("e.empname"),col("m.empname").alias("mgr_name"))\
+            .withColumn("mgr_name", coalesce(col('mgr_name'), lit("No_mgr")))
 result.show()
