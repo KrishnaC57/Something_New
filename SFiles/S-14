@@ -1,0 +1,14 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col,coalesce, lit
+spark = SparkSession.builder.appName('Find empname and mgrname').getOrCreate()
+
+data = [(101, 'ravi', None,10), (102,'muraga',101,10), (103,'avun',101,20), (104,'modi',103,20), (105,'kiran',103,20)]
+columns = ['empid', 'empname', 'mgrid', 'dept_no']
+
+df = spark.createDataFrame(data, columns)
+df.show()
+
+result = df.alias("e").join(df.alias("m"), col("e.mgrid") == col("m.empid"), "left")\
+            .select(col("e.empname"),col("m.empname").alias("mgrname"))\
+            .withColumn("mgr_name", coalesce(col('mgrname'), lit("No_mgr")))
+result.show()
