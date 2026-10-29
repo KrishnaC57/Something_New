@@ -1,0 +1,28 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col, max
+from pyspark.sql.window import Window
+
+spark = SparkSession.builder.appName("Scenario_12").getOrCreate()
+
+data = [
+    (101, "Amit",  "IT",      25,   60000),
+    (102, "Priya", "IT",      None, 75000),
+    (103, "Ravi",  "HR",      32,   50000),
+    (104, "Neha",  "HR",      28,   65000),
+    (105, "John",  "IT",      35,   90000),
+    (106, "Sara",  "Finance", None, 70000),
+    (107, "David", "Finance", 30,   85000),
+    (108, "Anil",  "HR",      40,   55000)
+]
+
+columns = ["Emp_ID", "Employee", "Department", "Age", "Salary"]
+
+df = spark.createDataFrame(data, columns)
+df.show()
+
+WindowSpec = Window.partitionBy('Department')
+
+result = df.withColumn("highest_salary", max('Salary').over(WindowSpec))\
+            .withColumn("Salary_Difference", col('highest_salary') - col('Salary'))\
+            .drop('highest_salary')
+result.show()
