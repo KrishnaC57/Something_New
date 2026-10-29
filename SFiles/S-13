@@ -1,0 +1,22 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col
+
+spark = SparkSession.builder.appName("nulls last").getOrCreate()
+
+data = [
+    (101, "Amit",  "IT",      25,   60000),
+    (102, "Priya", "IT",      None, 75000),
+    (103, "Ravi",  "HR",      32,   50000),
+    (104, "Neha",  "HR",      28,   65000),
+    (105, "John",  "IT",      35,   90000),
+    (106, "Sara",  "Finance", None, 70000),
+    (107, "David", "Finance", 30,   85000),
+    (108, "Anil",  "HR",      40,   55000)
+]
+
+columns = ["Emp_ID", "Employee", "Department", "Age", "Salary"]
+
+df = spark.createDataFrame(data, columns)
+df.show()
+
+result = df.orderBy(col("Age").asc_nulls_last()).show()
