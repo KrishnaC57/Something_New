@@ -1,0 +1,27 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import col,row_number
+from pyspark.sql.window import Window
+spark = SparkSession.builder.appName('third transaction of every user').getOrCreate()
+
+Data = [(111, 100.50, '2022-01-08 12:00:00'),
+(111, 55.00,  '2022-01-10 12:00:00'),
+(121, 36.00,  '2022-01-18 12:00:00'),
+(145, 24.99,  '2022-01-26 12:00:00'),
+(111, 89.60,  '2022-02-05 12:00:00'),
+(121, 44.50,  '2022-02-20 12:00:00'),
+(121, 67.90,  '2022-04-03 12:00:00'),
+(263, 45.00,  '2022-03-15 12:00:00'),
+(263, 80.00,  '2022-05-20 12:00:00'),
+(263, 100.00, '2022-07-12 12:00:00')]
+
+Columns = ['user_id', 'spend', 'transaction_date']
+
+df= spark.createDataFrame(Data, Columns)
+df.show()
+
+windowSpec = Window.partitionBy('user_id').orderBy('transaction_date')
+
+result = df.withColumn('rn',row_number().over(windowSpec))\
+            .filter(col('rn') == 3 )\
+            .drop('rn')
+result.show()
