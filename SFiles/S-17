@@ -1,0 +1,20 @@
+from pyspark.sql import SparkSession
+from pyspark.sql.functions import *
+
+spark = SparkSession.builder.appName('remove all delimeters and make a seperate columns').getOrCreate()
+
+raw_data = ["1,Alice\t30|New York"]
+
+df = spark.createDataFrame(raw_data,"string").toDF('raw_data')
+df.show()
+
+df_cleaned = df.withColumn('cln_data', regexp_replace(col('raw_data'),"[,\t|]","#")).drop('raw_data')
+
+final_df = df_cleaned.withColumn('cln_data', split(col('cln_data'),'#'))\
+                .select(col("cln_data")[0].cast("int").alias('id'),
+                        col("cln_data")[1].alias('name'),
+                        col("cln_data")[2].cast("int").alias('age'),
+                        col("cln_data")[3].alias('location')
+                       )
+
+final_df.show(truncate = False)
